@@ -2006,6 +2006,17 @@ window.L.Control.JSDialogBuilder = window.L.Control.extend({
 
 		var clickFunction = function (e) {
 			if (!div.hasAttribute('disabled')) {
+				if (data.id === 'home-italic' || data.id === 'italic' || data.command === '.uno:Italic') {
+					console.log("======")
+					console.log('CLICKED ITALICS: DEBUG 200');
+					console.log(data.id)
+					console.log("======")
+				} else {
+					console.log("======")
+					console.log('NOT CLICKED!!!!!: DEBUG 201');
+					console.log(data.id)
+					console.log("======")
+				}
 				builder.refreshSidebar = true;
 				if (data.postmessage) {
 					let isContextualButton = e.target.offsetParent.id === 'context-toolbar';
