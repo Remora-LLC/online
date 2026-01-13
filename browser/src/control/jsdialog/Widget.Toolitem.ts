@@ -76,20 +76,8 @@ function _mapDispatchToolItem(
 		}
 
 		$(control.container).click(() => {
-			if (control.container.getAttribute('disabled') === null) {
-				if (data.id === 'home-italic' || data.id === 'italic' || data.command === '.uno:Italic') {
-					console.log("======")
-					console.log('CLICKED ITALICS: DEBUG 150');
-					console.log(data.id)
-					console.log("======")
-				} else {
-					console.log("======")
-					console.log('NOT CLICKED...: DEBUG 151');
-					console.log(data.id)
-					console.log("======")
-				}
+			if (control.container.getAttribute('disabled') === null)
 				app.dispatcher.dispatch(data.command);
-			}
 		});
 	}
 
@@ -116,17 +104,6 @@ function _mapBigDispatchToolItem(
 	if (!builder.map.isLockedItem(data)) {
 		$(control.container).click((e: any) => {
 			e.preventDefault();
-			if (data.id === 'home-italic' || data.id === 'italic' || data.command === '.uno:Italic') {
-					console.log("======")
-					console.log('CLICKED ITALICS: DEBUG 180');
-					console.log(data.id)
-					console.log("======")
-				} else {
-					console.log("======")
-					console.log('NOT CLICKED...: DEBUG 181');
-					console.log(data.id)
-					console.log("======")
-			}
 			app.dispatcher.dispatch(data.command);
 		});
 	}
