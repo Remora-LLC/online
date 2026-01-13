@@ -76,12 +76,8 @@ function _mapDispatchToolItem(
 		}
 
 		$(control.container).click(() => {
-			if (control.container.getAttribute('disabled') === null) {
-				if (data.command === '.uno:Italic') {
-					console.log('CLICKED ITALICS');
-				}
+			if (control.container.getAttribute('disabled') === null)
 				app.dispatcher.dispatch(data.command);
-			}
 		});
 	}
 
@@ -108,9 +104,6 @@ function _mapBigDispatchToolItem(
 	if (!builder.map.isLockedItem(data)) {
 		$(control.container).click((e: any) => {
 			e.preventDefault();
-			if (data.command === '.uno:Italic') {
-				console.log('CLICKED ITALICS');
-			}
 			app.dispatcher.dispatch(data.command);
 		});
 	}
