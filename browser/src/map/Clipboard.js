@@ -368,9 +368,11 @@ window.L.Clipboard = window.L.Class.extend({
 
 			if (this._checkAndDisablePasteSpecial()) {
 				window.app.console.log('up-load done, now paste special');
+				console.log('PASTE: DEBUG 100');
 				app.socket.sendMessage('uno .uno:PasteSpecial');
 			} else {
 				window.app.console.log('up-load done, now paste');
+				console.log('PASTE (ASYNC): DEBUG 101');
 				app.socket.sendMessage('uno .uno:Paste');
 			}
 		} catch (_error) {
@@ -1105,6 +1107,7 @@ window.L.Clipboard = window.L.Class.extend({
 		} else if (cmd === '.uno:Cut') {
 			this._execCopyCutPaste('cut', cmd);
 		} else if (cmd === '.uno:Paste') {
+			console.log('PASTE COMMAND RECEIVED: DEBUG 148');
 			this._execCopyCutPaste('paste', cmd);
 		} else if (cmd === '.uno:PasteSpecial') {
 			if (this._navigatorClipboardRead(true)) {
@@ -1168,11 +1171,14 @@ window.L.Clipboard = window.L.Class.extend({
 		if (usePasteKeyEvent) {
 			// paste into dialog
 			var KEY_PASTE = 1299;
+			console.log('PASTE INTO DIALOG: DEBUG 200');
 			map._textInput._sendKeyEvent(0, KEY_PASTE);
 		} else if (this._checkAndDisablePasteSpecial()) {
+			console.log('PASTE SPECIAL COMMAND: DEBUG 201');
 			app.socket.sendMessage('uno .uno:PasteSpecial');
 		} else {
 			// paste into document
+			console.log('PASTE INTO DOCUMENT: DEBUG 202');
 			app.socket.sendMessage('uno .uno:Paste');
 		}
 	},
@@ -1185,6 +1191,7 @@ window.L.Clipboard = window.L.Class.extend({
 		if (this._map.isReadOnlyMode())
 			return;
 
+		console.log('PASTE EVENT: DEBUG 203');
 		window.app.console.log('Paste');
 
 		if (this._isAnyInputFieldSelected() && !this._isFormulabarSelected())
