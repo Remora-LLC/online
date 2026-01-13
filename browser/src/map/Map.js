@@ -1444,6 +1444,7 @@ window.L.Map = window.L.Evented.extend({
 
 	// Our browser tab lost focus.
 	_onLostFocus: function () {
+		console.log('WINDOW BLUR Tab/window lost focus: DEBUG');
 		window.prefs.sendPendingBrowserSettingsUpdate();
 		// don't deactivate view while Drag and Drop in Pivot table dialog
 		if (!JSDialog.isDnDActive())
@@ -1459,6 +1460,7 @@ window.L.Map = window.L.Evented.extend({
 
 	// Our browser tab got focus.
 	_onGotFocus: function () {
+		console.log('WINDOW FOCUS Tab/window gained focus: DEBUG');
 		if (this.editorHasFocus()) {
 			this.fire('editorgotfocus');
 		}

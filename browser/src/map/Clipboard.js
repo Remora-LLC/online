@@ -1107,7 +1107,6 @@ window.L.Clipboard = window.L.Class.extend({
 		} else if (cmd === '.uno:Cut') {
 			this._execCopyCutPaste('cut', cmd);
 		} else if (cmd === '.uno:Paste') {
-			console.log('PASTE COMMAND RECEIVED: DEBUG 148');
 			this._execCopyCutPaste('paste', cmd);
 		} else if (cmd === '.uno:PasteSpecial') {
 			if (this._navigatorClipboardRead(true)) {
@@ -1171,14 +1170,14 @@ window.L.Clipboard = window.L.Class.extend({
 		if (usePasteKeyEvent) {
 			// paste into dialog
 			var KEY_PASTE = 1299;
-			console.log('PASTE INTO DIALOG: DEBUG 200');
+			console.log('PASTE INTO DIALOG: DEBUG');
 			map._textInput._sendKeyEvent(0, KEY_PASTE);
 		} else if (this._checkAndDisablePasteSpecial()) {
-			console.log('PASTE SPECIAL COMMAND: DEBUG 201');
+			console.log('SPECIAL PASTE INTO DOCUMENT: DEBUG');
 			app.socket.sendMessage('uno .uno:PasteSpecial');
 		} else {
 			// paste into document
-			console.log('PASTE INTO DOCUMENT: DEBUG 202');
+			console.log('NON-SPECIAL PASTE INTO DOCUMENT: DEBUG');
 			app.socket.sendMessage('uno .uno:Paste');
 		}
 	},
@@ -1191,7 +1190,7 @@ window.L.Clipboard = window.L.Class.extend({
 		if (this._map.isReadOnlyMode())
 			return;
 
-		console.log('PASTE EVENT: DEBUG 203');
+		console.log('AN OVERALL PASTE OCCURRED: DEBUG');
 		window.app.console.log('Paste');
 
 		if (this._isAnyInputFieldSelected() && !this._isFormulabarSelected())
@@ -1213,6 +1212,14 @@ window.L.Clipboard = window.L.Class.extend({
 			// Always capture the html content separate as we may lose it when we
 			// pass the clipboard data to a different context (async calls, f.e.).
 			var htmlText = ev.clipboardData.getData('text/html');
+			var plainText = ev.clipboardData.getData('text/plain');
+			
+			// Record what text was pasted
+			console.log('PASTED TEXT (plain DEBUG):', plainText);
+			if (htmlText) {
+				console.log('PASTED TEXT (html DEBUG):', htmlText);
+			}
+			
 			var hasFinished = this.dataTransferToDocument(ev.clipboardData, /* preferInternal = */ true, htmlText, usePasteKeyEvent);
 			this._map._textInput._abortComposition(ev);
 			this._clipboardSerial++;
