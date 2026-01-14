@@ -127,10 +127,14 @@ window.L.Map.StateChangeHandler = window.L.Handler.extend({
 		if (commandName == '.uno:ReshufflePagePopup') {
 			if (!app.map.isReadOnlyMode())
 			{
-				app.map.uiManager.showSnackbar('Reorder pages?', 'Yes', function () {
+				app.map.uiManager.showSnackbar('Apply this order to your presentation?', 'Update Slides', function () {
 					app.map.sendUnoCommand('.uno:ReshufflePages');
 				});
 			}
+		}
+
+		if (commandName == '.uno:HasOverviewPage') {
+			app.impress.hasOverviewPage = e.state === "true";
 		}
 
 		$('#document-container').removeClass('slide-master-mode');

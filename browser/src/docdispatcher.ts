@@ -147,6 +147,19 @@ class Dispatcher {
 			});
 		};
 
+		this.actionsMap['localcomparedocuments'] = function () {
+			window.L.DomUtil.get('comparedocuments').click();
+		};
+		this.actionsMap['remotecomparedocuments'] = function () {
+			app.map.fire('postMessage', {
+				msgId: 'UI_InsertFile',
+				args: {
+					callback: 'Action_CompareDocuments',
+					mimeTypeFilter: app.LOUtil.documentMimeFilter,
+				},
+			});
+		};
+
 		this.actionsMap['charmapcontrol'] = function () {
 			app.map.sendUnoCommand('.uno:InsertSymbol');
 		};
@@ -332,6 +345,14 @@ class Dispatcher {
 
 		this.actionsMap['collapsenotebookbar'] = () => {
 			app.map.uiManager.collapseNotebookbar();
+		};
+
+		this.actionsMap['validatedialogsa11y'] = () => {
+			if (window.app.a11yValidator) {
+				window.app.a11yValidator.validateAllOpenDialogs();
+			} else {
+				console.warn('A11yValidator not available');
+			}
 		};
 	}
 
@@ -824,9 +845,11 @@ class Dispatcher {
 	public dispatch(action: string, data?: any) {
 		// Don't allow to execute new actions while any dialog is visible.
 		// It prevents launching multiple instances of the same dialog.
+		// Exception: validatedialogsa11y needs to run when dialogs are open.
 		if (
-			app.map.dialog.hasOpenedDialog() ||
-			(app.map.jsdialog && app.map.jsdialog.hasDialogOpened())
+			action !== 'validatedialogsa11y' &&
+			(app.map.dialog.hasOpenedDialog() ||
+				(app.map.jsdialog && app.map.jsdialog.hasDialogOpened()))
 		) {
 			app.map.dialog.blinkOpenDialog();
 			console.debug('Cannot dispatch: ' + action + ' when dialog is opened.');

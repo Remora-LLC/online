@@ -3,7 +3,7 @@
  * window.L.CanvasTileLayer is a layer with canvas based rendering.
  */
 
-/* global app JSDialog CanvasSectionContainer GraphicSelection CanvasOverlay CursorHeaderSection $ _ CPolyUtil CPolygon Cursor UNOKey cool OtherViewCellCursorSection TileManager SplitSection TextSelections CellSelectionMarkers URLPopUpSection CalcValidityDropDown DocumentBase CellCursorSection FormFieldButton TextCursorSection CStyleData CSelections CReferences */
+/* global app JSDialog CanvasSectionContainer GraphicSelection CanvasOverlay CursorHeaderSection $ _ CPolyUtil CPolygon Cursor UNOKey cool OtherViewCellCursorSection TileManager SplitSection TextSelections CellSelectionMarkers URLPopUpSection CalcValidityDropDown DocumentBase CellCursorSection FormFieldButton TextCursorSection CStyleData CSelections CReferences OtherViewGraphicSelectionSection */
 
 function clamp(num, min, max)
 {
@@ -457,6 +457,8 @@ window.L.CanvasTileLayer = window.L.Layer.extend({
 
 		this._canvas = window.L.DomUtil.createWithId('canvas', 'document-canvas', this._canvasContainer);
 		this._canvas.style.visibility = 'hidden';
+		this._canvas.role = 'img';
+		this._canvas.ariaLabel = _('Online Editor');
 
 		app.sectionContainer = new CanvasSectionContainer(this._canvas, this.isCalc() /* disableDrawing? */);
 		app.activeDocument = new DocumentBase();
@@ -992,6 +994,9 @@ window.L.CanvasTileLayer = window.L.Layer.extend({
 		}
 		else if (textMsg.startsWith('cellviewcursor:')) {
 			this._onCellViewCursorMsg(textMsg);
+		}
+		else if (textMsg.startsWith('viewlock')) {
+			this._onViewLockInfoMsg(textMsg);
 		}
 		else if (textMsg.startsWith('viewinfo:')) {
 			this._onViewInfoMsg(textMsg);
@@ -1869,6 +1874,16 @@ window.L.CanvasTileLayer = window.L.Layer.extend({
 		return strTwips;
 	},
 
+	_onViewLockInfoMsg: function(textMsg) {
+		var obj = JSON.parse(textMsg.substring('viewlock:'.length + 1));
+		const viewId = parseInt(obj.viewId);
+
+		if (obj.rectangle !== "EMPTY")
+			OtherViewGraphicSelectionSection.setViewLockInfo(viewId, obj);
+		else
+			OtherViewGraphicSelectionSection.setViewLockInfo(viewId, null);
+	},
+
 	_onCellViewCursorMsg: function (textMsg) {
 		var obj = JSON.parse(textMsg.substring('cellviewcursor:'.length + 1));
 		var viewId = parseInt(obj.viewId);
@@ -2166,6 +2181,16 @@ window.L.CanvasTileLayer = window.L.Layer.extend({
 
 	adjustTextSelectionRectanglesForCalc: function(rawRectangles, viewId) {
 		if (!app.map._docLayer.sheetGeometry) return;
+
+		// This state is false when a shape is selected or a selected shape's text is being edited.
+		// We will use this to determine the origin of the selection rectangles.
+		let cellProtectionState = app.map.stateChangeHandler.getItemValue('.uno:CellProtection') === 'true';
+
+		// For other views, there is "viewlock" message that indicates if that user is editing inside an object. We will check that.
+		cellProtectionState = viewId !== undefined ? !OtherViewGraphicSelectionSection.hasViewLockInfo(viewId) : cellProtectionState;
+
+		// Do nothing if cellProtectionState is false.
+		if (!cellProtectionState) return;
 
 		for (let i = 0; i < rawRectangles.length; i++) {
 			app.map._docLayer.sheetGeometry.convertRawRectangleToTileTwips(rawRectangles[i]);
