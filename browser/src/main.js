@@ -101,6 +101,10 @@ if (window.ThisIsTheEmscriptenApp) {
 	var docParamsPart = docParamsString ? (docURL.includes('?') ? '&' : '?') + docParamsString : '';
 	var encodedWOPI = encodeURIComponent(docURL + docParamsPart);
 
+	console.log('DOCPARAMSSTRING: (DEBUG)', docParamsString)
+	console.log('DOCPARAMS: (DEBUG)', docParamsPart)
+	console.log('ENCODED WOPI: (DEBUG)', encodedWOPI)
+
 	globalThis.Module = createEmscriptenModule(
 		isWopi ? 'server' : 'local', isWopi ? encodedWOPI : docURL);
 	globalThis.Module.onRuntimeInitialized = function() {
