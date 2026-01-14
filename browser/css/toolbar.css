@@ -340,6 +340,7 @@
 	font-weight: bold;
 	width: 95%;
 	text-align: center;
+	display: none; /* Hide the document filename */
 }
 
 #document-name-input.editable {
@@ -355,6 +356,68 @@
 	border-radius: 20px;
 	box-shadow: inset 0 0 2px 0 var(--color-border-dark);
 	background-color: var(--color-background-lighter);
+}
+
+/* Autosave Indicator */
+#autosave-indicator {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 8px;
+	margin-right: 8px;
+	font-size: var(--default-font-size);
+	border-radius: var(--border-radius);
+	transition: all 0.3s ease;
+}
+
+#autosave-indicator.saving {
+	color: var(--color-main-text);
+	background-color: var(--color-background-lighter);
+}
+
+#autosave-indicator.saved {
+	color: var(--color-text-lighter);
+	background-color: var(--color-background-dark);
+}
+
+.autosave-text {
+	font-size: var(--default-font-size);
+	white-space: nowrap;
+}
+
+.autosave-spinner {
+	width: 12px;
+	height: 12px;
+	border: 2px solid var(--color-border-dark);
+	border-top-color: var(--color-main-text);
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+	display: none;
+}
+
+#autosave-indicator.saving .autosave-spinner {
+	display: block;
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}
+
+/* Submit Button Styling */
+#submit.unotoolbutton {
+	background-color: var(--color-primary);
+	color: var(--color-primary-text);
+	border: 1px solid var(--color-primary);
+}
+
+#submit.unotoolbutton:hover:not([disabled]) {
+	background-color: var(--color-primary-dark);
+	border-color: var(--color-primary-dark);
+}
+
+#submit.unotoolbutton[disabled] {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 .main-nav:not(.hasnotebookbar) #document-name-input.editable {

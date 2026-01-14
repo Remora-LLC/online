@@ -407,6 +407,8 @@ class UIManager extends window.L.Control {
 
 		this.documentNameInput = window.L.control.documentNameInput();
 		this.map.addControl(this.documentNameInput);
+		this.map.autosaveIndicator = window.L.control.autosaveIndicator();
+		this.map.addControl(this.map.autosaveIndicator);
 		this.map.addControl(window.L.control.alertDialog());
 		if (window.mode.isMobile()) {
 			this.mobileWizard = window.L.control.mobileWizard();

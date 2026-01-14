@@ -38,6 +38,21 @@ class Dispatcher {
 			}
 		};
 
+		this.actionsMap['submit'] = function () {
+			// Submit action - can be customized based on your needs
+			// For now, it will save and then fire a submit event
+			if (!app.map.isReadOnlyMode()) {
+				app.map.fire('postMessage', {
+					msgId: 'UI_Submit',
+					args: { source: 'toolbar' },
+				});
+				// Save before submitting
+				if (!app.map._disableDefaultAction['UI_Save']) {
+					app.map.save(false, false);
+				}
+			}
+		};
+
 		this.actionsMap['closeapp'] = () => {
 			if ((window as any).ThisIsAMobileApp) {
 				window.postMobileMessage('BYE');

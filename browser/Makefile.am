@@ -503,6 +503,7 @@ COOL_JS_LST =\
 	src/control/Control.NotebookbarBase.ts \
 	src/control/Control.UIManager.ts \
 	src/control/Control.DocumentNameInput.js \
+	src/control/Control.AutosaveIndicator.js \
 	src/control/Notebookbar.WriterReferencesTab.ts \
 	src/control/Control.Notebookbar.js \
 	src/control/Control.NotebookbarWriter.js \
@@ -1115,6 +1116,7 @@ pot:
 		src/control/Control.Command.js \
 		src/control/Control.ContextMenu.js \
 		src/control/Control.DocumentNameInput.js \
+		src/control/Control.AutosaveIndicator.js \
 		src/control/Control.DocumentRepair.js \
 		src/control/Control.DownloadProgress.js \
 		src/control/Control.ESignature.ts \

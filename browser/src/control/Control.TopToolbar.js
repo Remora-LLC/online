@@ -216,6 +216,8 @@ class TopToolbar extends JSDialog.Toolbar {
 				{type: 'overflowgroup', id: 'other-toptoolbar', children: otherGroup},
 			]},
 			{type: 'spacer', id: 'topspacer'},
+			{type: 'separator', orientation: 'vertical', id: 'breaksubmit', mobile: false},
+			{type: 'customtoolitem',  id: 'submit', command: 'submit', text: _('Submit'), mobile: false, tablet: false},
 			{type: 'separator', orientation: 'vertical', id: 'breaksidebar', visible: false},
 			{type: 'toolitem',  id: 'sidebar', text: _UNO('.uno:Sidebar', '', true), command: '.uno:SidebarDeck.PropertyDeck', visible: false},
 			{type: 'toolitem',  id: 'modifypage', text: _UNO('.uno:ModifyPage', 'presentation', true), command: '.uno:ModifyPage', visible: false},
