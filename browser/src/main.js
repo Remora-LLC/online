@@ -26,9 +26,9 @@ var wopiSrc = global.coolParams.get('WOPISrc');
 // Parse file ID from WOPISrc
 var fileId = null;
 
-if (wopiSrcRaw) {
+if (wopiSrc) {
 	try {
-		var url = new URL(wopiSrcRaw);
+		var url = new URL(wopiSrc);
 		var parts = url.pathname.split('/').filter(Boolean);
 
 		// Expected path: /wopi/files/<fileId>
