@@ -18,6 +18,8 @@
 
 (function (global) {
 
+var { TelemetryClient, WebSocketTransport } = require('@remora-llc/telemetry');
+
 console.log('[INIT] bundle start');
 
 var wopiParams = {};
