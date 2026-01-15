@@ -16,6 +16,8 @@
 /* global ServerConnectionService createEmscriptenModule */
 /*eslint indent: [error, "tab", { "outerIIFEBody": 0 }]*/
 
+import { TelemetryClient, WebSocketTransport } from '@remora-llc/telemetry';
+
 (function (global) {
 
 console.log('[INIT] bundle start');
@@ -23,6 +25,24 @@ console.log('[INIT] bundle start');
 var wopiParams = {};
 var wopiSrc = global.coolParams.get('WOPISrc');
 
+// Parse file ID from WOPISrc
+var fileId = null;
+
+if (wopiSrcRaw) {
+	try {
+		var url = new URL(wopiSrcRaw);
+		var parts = url.pathname.split('/').filter(Boolean);
+
+		// Expected path: /wopi/files/<fileId>
+		if (parts.length >= 3 && parts[0] === 'wopi' && parts[1] === 'files') {
+			fileId = parts[2];
+		}
+	} catch (e) {
+		console.error('[WOPI] Failed to parse WOPISrc:', e);
+	}
+}
+
+console.log('[WOPI] Parsed fileId:', fileId);
 console.log('[PARAM] WOPISrc raw:', wopiSrc);
 console.log('[PARAM] accessToken:', accessToken);
 console.log('[PARAM] accessTokenTTL:', accessTokenTTL);
