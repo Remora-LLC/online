@@ -16,6 +16,8 @@
         "@remora-llc/remora-telemetry": ["../../remora-telemetry/dist/index"],
         "@remora-llc/protocol/*": ["../../remora-protocol/generated/typescript/*"]
       },
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
       "plugins": [
         {
           "name": "typescript-strict-plugin"
