@@ -2,7 +2,7 @@
   "compileOnSave": false,
     "compilerOptions": {
       "target": "es5",
-      "module": "commonjs",
+      "module": "esnext",
       "lib": ["dom", "es2016"],
       "sourceMap": false,
       "incremental": true,
@@ -13,7 +13,7 @@
       "downlevelIteration": true,
       "watch": false,
       "paths": {
-        "@remora-llc/remora-telemetry": ["../../remora-telemetry/dist/index.cjs"],
+        "@remora-llc/remora-telemetry": ["../../remora-telemetry/dist/index"],
         "@remora-llc/protocol/*": ["../../remora-protocol/generated/typescript/*"]
       },
       "traceResolution": true,
