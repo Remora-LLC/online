@@ -23,7 +23,6 @@
 // eslint-disable-next-line no-undef
 var { TelemetryClient, WebSocketTransport } = require('@remora-llc/telemetry');
 
-// var { HazardFlag } = require('@remora-llc/protocol/analysis-common');
 
 console.log('[INIT] bundle start');
 
@@ -46,6 +45,18 @@ if (wopiSrc) {
 		console.error('[WOPI] Failed to parse WOPISrc:', e);
 	}
 }
+
+  const transport = new WebSocketTransport(
+        `wss://dashboard-testing.remora.llc/global/api/v1/analysis/file/${fileId}`
+    );
+
+    // Expose telemetry globally
+    globalThis.telemetryReady = (async () => {
+        await transport.waitForHandshake();
+        const telemetry = new TelemetryClient(transport);
+        globalThis.telemetry = telemetry;
+        return telemetry;
+    })();
 
 console.log('[WOPI] Parsed fileId:', fileId);
 console.log('[PARAM] WOPISrc raw:', wopiSrc);

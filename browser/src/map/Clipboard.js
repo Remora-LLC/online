@@ -19,6 +19,12 @@
 // download logic in one place ...
 // We keep track of the current selection content if it is simple
 // So we can do synchronous copy/paste in the callback if possible.
+import {
+  PasteActionType,
+  PasteCitationStatus,
+  PasteFormatStatus,
+} from '@remora-llc/protocol/analysis-paste';
+
 window.L.Clipboard = window.L.Class.extend({
 	initialize: function(map) {
 		this._map = map;
@@ -1178,6 +1184,21 @@ window.L.Clipboard = window.L.Class.extend({
 		} else {
 			// paste into document
 			console.log('NON-SPECIAL PASTE INTO DOCUMENT: DEBUG');
+			 if (globalThis.telemetryReady) {
+            globalThis.telemetryReady
+                .then(telemetry => {
+                    trackPasteAction(
+                        telemetry,
+                        pastedText,
+                        PasteActionType.Internal,
+                        PasteCitationStatus.Uncited,
+                        PasteFormatStatus.NotSet
+                    );
+                })
+                .catch(e => {
+                    console.warn('Telemetry failed:', e);
+                });
+        }
 			app.socket.sendMessage('uno .uno:Paste');
 		}
 	},
