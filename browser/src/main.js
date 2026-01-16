@@ -16,12 +16,12 @@
 /* global ServerConnectionService createEmscriptenModule */
 /*eslint indent: [error, "tab", { "outerIIFEBody": 0 }]*/
 
-import { HazardFlag } from '@remora-llc/protocol/analysis-common';
+// import { HazardFlag } from '@remora-llc/protocol/analysis-common';
 
 (function (global) {
 
-// var { TelemetryClient, WebSocketTransport } = require('@remora-llc/telemetry');
-// var { HazardFlag } = require('@remora-llc/protocol/analysis-common')
+// eslint-disable-next-line no-undef
+var { HazardFlag } = require('@remora-llc/protocol/analysis-common');
 
 console.log('[INIT] bundle start');
 
