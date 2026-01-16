@@ -18,11 +18,9 @@
 
 // import { HazardFlag } from '@remora-llc/protocol/analysis-common';
 
+import { TelemetryClient, WebSocketTransport } from '@remora-llc/telemetry';
+
 (function (global) {
-
-// eslint-disable-next-line no-undef
-var { TelemetryClient, WebSocketTransport } = require('@remora-llc/telemetry');
-
 
 console.log('[INIT] bundle start');
 
