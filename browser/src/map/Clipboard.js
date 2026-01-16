@@ -19,11 +19,11 @@
 // download logic in one place ...
 // We keep track of the current selection content if it is simple
 // So we can do synchronous copy/paste in the callback if possible.
-import {
+var {
   PasteActionType,
   PasteCitationStatus,
   PasteFormatStatus,
-} from '@remora-llc/protocol/analysis-paste';
+} = require('@remora-llc/protocol/analysis-paste');
 
 window.L.Clipboard = window.L.Class.extend({
 	initialize: function(map) {

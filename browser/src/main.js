@@ -46,17 +46,15 @@ if (wopiSrc) {
 	}
 }
 
-  const transport = new WebSocketTransport(
-        `wss://dashboard-testing.remora.llc/global/api/v1/analysis/file/${fileId}`
-    );
+const transport = new WebSocketTransport(`wss://dashboard-testing.remora.llc/global/api/v1/analysis/file/${fileId}`);
 
-    // Expose telemetry globally
-    globalThis.telemetryReady = (async () => {
-        await transport.waitForHandshake();
-        const telemetry = new TelemetryClient(transport);
-        globalThis.telemetry = telemetry;
-        return telemetry;
-    })();
+// Expose telemetry globally
+globalThis.telemetryReady = (async () => {
+	await transport.waitForHandshake();
+	const telemetry = new TelemetryClient(transport);
+	globalThis.telemetry = telemetry;
+	return telemetry;
+})();
 
 console.log('[WOPI] Parsed fileId:', fileId);
 console.log('[PARAM] WOPISrc raw:', wopiSrc);
