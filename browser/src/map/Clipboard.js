@@ -1239,8 +1239,7 @@ window.L.Clipboard = window.L.Class.extend({
                         PasteFormatStatus.NotSet
                     );
 				}).catch(e => {console.warn('Telemetry failed:', e);});
-       		}
-
+			}
 			if (htmlText) {
 				console.log('PASTED TEXT (html DEBUG):', htmlText);
 			}
