@@ -14,22 +14,20 @@
  */
 
 /* global app DocUtil _ brandProductName $ ClipboardItem Promise GraphicSelection cool JSDialog */
-/* global require globalThis */
+/* global globalThis */
 
 // Get all interesting clipboard related events here, and handle
 // download logic in one place ...
 // We keep track of the current selection content if it is simple
 // So we can do synchronous copy/paste in the callback if possible.
 
-// eslint-disable-next-line no-undef
-var {
-  PasteActionType,
-  PasteCitationStatus,
-  PasteFormatStatus,
-} = require('@remora-llc/protocol/analysis-paste');
+// var {
+//   PasteActionType,
+//   PasteCitationStatus,
+//   PasteFormatStatus,
+// } = require('@remora-llc/protocol/analysis-paste');
 
-// eslint-disable-next-line no-undef
-var{ trackPasteAction } = require('@remora-llc/telemetry');
+// var{ trackPasteAction } = require('@remora-llc/telemetry');
 
 window.L.Clipboard = window.L.Class.extend({
 	initialize: function(map) {
@@ -1228,18 +1226,18 @@ window.L.Clipboard = window.L.Class.extend({
 			
 			// Record what text was pasted
 			console.log('PASTED TEXT (plain DEBUG):', plainText);
-			if (globalThis.telemetryReady) {
-            globalThis.telemetryReady
-                .then(telemetry => {
-                    trackPasteAction(
-                        telemetry,
-                        plainText,
-                        PasteActionType.Internal,
-                        PasteCitationStatus.Uncited,
-                        PasteFormatStatus.NotSet
-                    );
-				}).catch(e => {console.warn('Telemetry failed:', e);});
-			}
+			// if (globalThis.telemetryReady) {
+            // globalThis.telemetryReady
+            //     .then(telemetry => {
+            //         trackPasteAction(
+            //             telemetry,
+            //             plainText,
+            //             PasteActionType.Internal,
+            //             PasteCitationStatus.Uncited,
+            //             PasteFormatStatus.NotSet
+            //         );
+			// 	}).catch(e => {console.warn('Telemetry failed:', e);});
+			// }
 			if (htmlText) {
 				console.log('PASTED TEXT (html DEBUG):', htmlText);
 			}
