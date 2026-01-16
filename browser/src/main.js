@@ -18,7 +18,8 @@
 
 (function (global) {
 
-var { TelemetryClient, WebSocketTransport } = require('@remora-llc/telemetry');
+// var { TelemetryClient, WebSocketTransport } = require('@remora-llc/telemetry');
+var { HazardFlag } = require('@remora-llc/protocol/analysis-common')
 
 console.log('[INIT] bundle start');
 
