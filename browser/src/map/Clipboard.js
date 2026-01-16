@@ -14,7 +14,7 @@
  */
 
 /* global app DocUtil _ brandProductName $ ClipboardItem Promise GraphicSelection cool JSDialog */
-/* global globalThis */
+/* global require globalThis */
 
 // Get all interesting clipboard related events here, and handle
 // download logic in one place ...
@@ -27,6 +27,9 @@ var {
   PasteCitationStatus,
   PasteFormatStatus,
 } = require('@remora-llc/protocol/analysis-paste');
+
+// eslint-disable-next-line no-undef
+var{ trackPasteAction } = require('@remora-llc/telemetry');
 
 window.L.Clipboard = window.L.Class.extend({
 	initialize: function(map) {
@@ -1235,10 +1238,7 @@ window.L.Clipboard = window.L.Class.extend({
                         PasteCitationStatus.Uncited,
                         PasteFormatStatus.NotSet
                     );
-                })
-                .catch(e => {
-                    console.warn('Telemetry failed:', e);
-                });
+				}).catch(e => {console.warn('Telemetry failed:', e);});
        		}
 
 			if (htmlText) {
