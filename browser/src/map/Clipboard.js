@@ -14,11 +14,14 @@
  */
 
 /* global app DocUtil _ brandProductName $ ClipboardItem Promise GraphicSelection cool JSDialog */
+/* global globalThis */
 
 // Get all interesting clipboard related events here, and handle
 // download logic in one place ...
 // We keep track of the current selection content if it is simple
 // So we can do synchronous copy/paste in the callback if possible.
+
+// eslint-disable-next-line no-undef
 var {
   PasteActionType,
   PasteCitationStatus,
@@ -1184,21 +1187,6 @@ window.L.Clipboard = window.L.Class.extend({
 		} else {
 			// paste into document
 			console.log('NON-SPECIAL PASTE INTO DOCUMENT: DEBUG');
-			 if (globalThis.telemetryReady) {
-            globalThis.telemetryReady
-                .then(telemetry => {
-                    trackPasteAction(
-                        telemetry,
-                        pastedText,
-                        PasteActionType.Internal,
-                        PasteCitationStatus.Uncited,
-                        PasteFormatStatus.NotSet
-                    );
-                })
-                .catch(e => {
-                    console.warn('Telemetry failed:', e);
-                });
-        }
 			app.socket.sendMessage('uno .uno:Paste');
 		}
 	},
@@ -1237,6 +1225,22 @@ window.L.Clipboard = window.L.Class.extend({
 			
 			// Record what text was pasted
 			console.log('PASTED TEXT (plain DEBUG):', plainText);
+			if (globalThis.telemetryReady) {
+            globalThis.telemetryReady
+                .then(telemetry => {
+                    trackPasteAction(
+                        telemetry,
+                        plainText,
+                        PasteActionType.Internal,
+                        PasteCitationStatus.Uncited,
+                        PasteFormatStatus.NotSet
+                    );
+                })
+                .catch(e => {
+                    console.warn('Telemetry failed:', e);
+                });
+       		}
+
 			if (htmlText) {
 				console.log('PASTED TEXT (html DEBUG):', htmlText);
 			}
