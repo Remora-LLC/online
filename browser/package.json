@@ -56,7 +56,6 @@
   "dependencies": {
     "jsdom": "^16.4.0",
     "nan": "^2.22.0",
-    "@remora-llc/protocol": "file:../../remora-protocol",
     "@remora-llc/telemetry": "file:../../remora-telemetry"
   },
   "scripts": {
