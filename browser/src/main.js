@@ -21,7 +21,9 @@
 (function (global) {
 
 // eslint-disable-next-line no-undef
-var { HazardFlag } = require('@remora-llc/protocol/analysis-common');
+var { TelemetryClient, WebSocketTransport } = require('@remora-llc/telemetry');
+
+// var { HazardFlag } = require('@remora-llc/protocol/analysis-common');
 
 console.log('[INIT] bundle start');
 
