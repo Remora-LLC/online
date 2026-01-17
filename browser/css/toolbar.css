@@ -340,7 +340,7 @@
 	font-weight: bold;
 	width: 95%;
 	text-align: center;
-	display: none; /* Hide the document filename */
+	display: none !important; /* Hide the document filename */
 }
 
 #document-name-input.editable {
