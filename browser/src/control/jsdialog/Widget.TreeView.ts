@@ -1345,9 +1345,7 @@ class TreeViewControl {
 
 			oldElement.removeAttribute('tabindex');
 			var oldInput = Array.from(
-				listElements
-					[fromIndex]
-					.querySelectorAll('.ui-treeview-entry > div > input'),
+				listElements[fromIndex].querySelectorAll('.ui-treeview-entry > div > input'),
 			) as Array<HTMLElement>;
 			if (oldInput && oldInput.length) oldInput[0].tabIndex = -1;
 		}
