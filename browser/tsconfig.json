@@ -3,8 +3,13 @@
     "compilerOptions": {
       "target": "es5",
       "module": "esnext",
-      "lib": ["dom", "es2016"],
-      "types": ["node"],
+      "lib": ["dom", "dom.iterable", "es2016"],
+      "types": [
+        "node",
+        "jquery",
+        "jqueryui",
+        "hammerjs"
+      ],
       "sourceMap": false,
       "incremental": true,
       "skipLibCheck": true,
