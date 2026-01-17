@@ -14,6 +14,7 @@
 /* global errorMessages accessToken accessTokenTTL noAuthHeader accessHeader createOnlineModule */
 /* global app $ host idleTimeoutSecs outOfFocusTimeoutSecs _ LocaleService LayoutingService */
 /* global ServerConnectionService createEmscriptenModule */
+/* global TelemetryClient, WebSocketTransport */
 
 // import { HazardFlag } from '@remora-llc/protocol/analysis-common';
 
