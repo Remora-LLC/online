@@ -14,7 +14,6 @@
 /* global errorMessages accessToken accessTokenTTL noAuthHeader accessHeader createOnlineModule */
 /* global app $ host idleTimeoutSecs outOfFocusTimeoutSecs _ LocaleService LayoutingService */
 /* global ServerConnectionService createEmscriptenModule */
-/*eslint indent: [error, "tab", { "outerIIFEBody": 0 }]*/
 
 // import { HazardFlag } from '@remora-llc/protocol/analysis-common';
 
