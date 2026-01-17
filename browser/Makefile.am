@@ -225,7 +225,7 @@ NODE_MODULES_JS =\
 	node_modules/gl-matrix/gl-matrix-min.js
 
 COOL_LIBS_JS =\
-	telemetry-entry.js \
+	telemetry-embed.js \
 	ResizeObserverPolyfill.js \
 	Autolinker.js \
 	select2.js \
