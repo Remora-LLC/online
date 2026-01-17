@@ -21,7 +21,7 @@ import {
 	PasteFormatStatus,
 } from '@remora-llc/protocol/analysis-paste';
 
-import { getTelemetry } from "../../telemetry";
+import { getTelemetry } from "../telemetry";
 
 /* global app DocUtil _ brandProductName $ ClipboardItem Promise GraphicSelection cool JSDialog */
 /* global globalThis */

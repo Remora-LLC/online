@@ -19,7 +19,7 @@
 // import { HazardFlag } from '@remora-llc/protocol/analysis-common';
 
 import { TelemetryClient, WebSocketTransport } from '@remora-llc/telemetry';
-import { initTelemetry } from '../telemetry';
+import { initTelemetry } from './telemetry';
 
 (function (global) {
 
