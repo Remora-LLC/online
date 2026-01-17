@@ -1239,7 +1239,7 @@ window.L.Clipboard = window.L.Class.extend({
 			const telemetry = getTelemetry();
 			trackPasteAction(
 				telemetry,
-				pastedText,
+				plainText,
 				PasteActionType.Internal,
 				PasteCitationStatus.Uncited,
 				PasteFormatStatus.NotSet
