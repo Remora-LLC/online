@@ -19,6 +19,15 @@
 
 // import { initTelemetry } from './telemetry';
 // telemetry.js
+
+import { TelemetryClient, WebSocketTransport } from '@remora-llc/telemetry';
+
+// Expose it so the legacy bundle can find it
+window.TelemetryLib = {
+    TelemetryClient: TelemetryClient,
+    WebSocketTransport: WebSocketTransport
+};
+
 (function (global) {
 	const { TelemetryClient, WebSocketTransport } = global.TelemetryLib; // adjust if needed
 
