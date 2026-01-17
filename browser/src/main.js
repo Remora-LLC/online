@@ -20,8 +20,6 @@
 // import { initTelemetry } from './telemetry';
 // telemetry.js
 
-import { TelemetryClient, WebSocketTransport } from '@remora-llc/telemetry';
-
 // Expose it so the legacy bundle can find it
 window.TelemetryLib = {
     TelemetryClient: TelemetryClient,
@@ -29,7 +27,7 @@ window.TelemetryLib = {
 };
 
 (function (global) {
-	const { TelemetryClient, WebSocketTransport } = global.TelemetryLib; // adjust if needed
+	const { TelemetryClient, WebSocketTransport } = global.TelemetryLib;
 
 	let telemetryPromise = null;
 	let telemetryClient = null;
@@ -52,13 +50,9 @@ window.TelemetryLib = {
 
 	global.getTelemetry = function () {
 		if (!telemetryClient) {
-			throw new Error('Telemetry not initialized. Call initTelemetry() first.');
+			throw new Error('Telemetry not initialized');
 		}
 		return telemetryClient;
-	};
-
-	global.getTelemetryReady = function () {
-		return telemetryPromise;
 	};
 })(window);
 
