@@ -3,7 +3,7 @@
     "compilerOptions": {
       "target": "es5",
       "module": "esnext",
-      "lib": ["dom", "es2016"],
+      "lib": ["dom", "es2019", "es2021"],
       "sourceMap": false,
       "incremental": true,
       "skipLibCheck": true,
