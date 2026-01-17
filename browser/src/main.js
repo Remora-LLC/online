@@ -159,7 +159,9 @@ class WebSocketTransport {
 					this.startingActionId = msg.startingActionId;
 					console.log('[WS] Starting action ID:', this.startingActionId);
 				}
-			} catch (e) {}
+			} catch (e) {
+				console.warn('[WS] Failed to parse incoming message', e);
+			}
 		});
 		this.ws.addEventListener('close', () => {
 			console.log('[WS] Closed, reconnecting...');
@@ -227,6 +229,7 @@ app.telemetry = new TelemetryClient(app.socket);
 app.telemetry.initialize();
 console.log('[TELEMETRY] Initialized');
 
+/* eslint-disable no-unused-vars */
 function trackEditAction(type) {
 	app.telemetry.push({ hazard: app.HazardFlag.Edit, type: 'Edit', action_type: type });
 }
@@ -267,6 +270,7 @@ function trackNudgeAction(accept, contentType, text) {
 		text
 	});
 }
+/* eslint-disable no-unused-vars */
 
 ////// Map Creation //////
 
