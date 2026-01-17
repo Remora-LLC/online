@@ -1,0 +1,5 @@
+{
+	"devDependencies": {
+		"esbuild-plugin-tsconfig-paths": "^1.0.2"
+	}
+}
