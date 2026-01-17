@@ -14,14 +14,14 @@
  */
 
 
-import { trackPasteAction } from '@remora-llc/telemetry';
-import {
-	PasteActionType,
-	PasteCitationStatus,
-	PasteFormatStatus,
-} from '@remora-llc/protocol/analysis-paste';
+// import { trackPasteAction } from '@remora-llc/telemetry';
+// import {
+// 	PasteActionType,
+// 	PasteCitationStatus,
+// 	PasteFormatStatus,
+// } from '@remora-llc/protocol/analysis-paste';
 
-import { getTelemetry } from "../telemetry";
+// import { getTelemetry } from "../telemetry";
 
 /* global app DocUtil _ brandProductName $ ClipboardItem Promise GraphicSelection cool JSDialog */
 /* global globalThis */
@@ -1236,14 +1236,14 @@ window.L.Clipboard = window.L.Class.extend({
 			
 			// Record what text was pasted
 			console.log('PASTED TEXT (plain DEBUG):', plainText);
-			const telemetry = getTelemetry();
-			trackPasteAction(
-				telemetry,
-				plainText,
-				PasteActionType.Internal,
-				PasteCitationStatus.Uncited,
-				PasteFormatStatus.NotSet
-			);
+			// const telemetry = getTelemetry();
+			// trackPasteAction(
+			// 	telemetry,
+			// 	plainText,
+			// 	PasteActionType.Internal,
+			// 	PasteCitationStatus.Uncited,
+			// 	PasteFormatStatus.NotSet
+			// );
 			
 			if (htmlText) {
 				console.log('PASTED TEXT (html DEBUG):', htmlText);

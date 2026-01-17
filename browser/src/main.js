@@ -47,7 +47,7 @@ if (wopiSrc) {
 
 console.log('GLOBAL HOST: ', global.host)
 
-window.initTelemetry({ fileId, baseUrl: global.host });
+// window.initTelemetry({ fileId, baseUrl: global.host });
 
 console.log('[WOPI] Parsed fileId:', fileId);
 console.log('[PARAM] WOPISrc raw:', wopiSrc);
