@@ -1,9 +1,10 @@
 {
   "compileOnSave": false,
     "compilerOptions": {
-      "target": "es5",
+      "target": "es2017",
       "module": "esnext",
-      "lib": ["dom", "es2016"],
+      "lib": ["dom", "ES2020"],
+      "types": ["node"],
       "sourceMap": false,
       "incremental": true,
       "skipLibCheck": true,
@@ -12,10 +13,9 @@
       "removeComments": false,
       "preserveConstEnums": false,
       "downlevelIteration": true,
+      "forceConsistentCasingInFileNames": true,
+      "strict": true,
       "watch": false,
-      "paths": {
-        "@remora-llc/remora-telemetry": ["../../remora-telemetry/dist/index"],
-      },
       "traceResolution": true,
       "esModuleInterop": true,
       "allowSyntheticDefaultImports": true,
