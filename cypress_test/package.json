@@ -23,7 +23,7 @@
     "get-port-cli": "2.0.0",
     "patch-package": "^8.0.1",
     "semver": "^7.5.4",
-    "typescript": "5.0.4",
+    "typescript": "5.9.3",
     "wait-on": "7.0.1",
     "webpack": "^5.88.1"
   },
