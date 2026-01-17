@@ -15,7 +15,7 @@
       "watch": false,
       "paths": {
         "@remora-llc/telemetry": ["../../remora-telemetry/dist/index"],
-        "@remora-llc/protocol": ["../../remora-protocol/generated/typescript/*"]
+        "@remora-llc/protocol/*": ["../../remora-protocol/generated/typescript/*"]
       },
       "traceResolution": true,
       "esModuleInterop": true,
