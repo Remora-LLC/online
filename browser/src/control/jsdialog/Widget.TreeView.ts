@@ -1329,29 +1329,29 @@ class TreeViewControl {
 		fromIndex: number,
 		toIndex: number,
 	) {
-		var nextElement = listElements.at(toIndex);
+		var nextElement = listElements[toIndex];
 		nextElement.tabIndex = 0;
 		nextElement.focus();
 
 		var nextInput = Array.from(
 			listElements
-				.at(toIndex)
+				[toIndex]
 				.querySelectorAll('.ui-treeview-entry > div > input'),
 		) as Array<HTMLElement>;
 		if (nextInput && nextInput.length)
-			nextInput.at(0).removeAttribute('tabindex');
+			nextInput[0]?.removeAttribute('tabindex');
 
 		if (fromIndex >= 0) {
-			var oldElement = listElements.at(fromIndex);
+			var oldElement = listElements[fromIndex];
 			if (window.L.DomUtil.hasClass(oldElement, 'selected')) return;
 
 			oldElement.removeAttribute('tabindex');
 			var oldInput = Array.from(
 				listElements
-					.at(fromIndex)
+					[fromIndex]
 					.querySelectorAll('.ui-treeview-entry > div > input'),
 			) as Array<HTMLElement>;
-			if (oldInput && oldInput.length) oldInput.at(0).tabIndex = -1;
+			if (oldInput && oldInput.length) oldInput[0].tabIndex = -1;
 		}
 	}
 
