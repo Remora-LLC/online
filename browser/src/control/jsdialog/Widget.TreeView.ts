@@ -1334,8 +1334,7 @@ class TreeViewControl {
 		nextElement.focus();
 
 		var nextInput = Array.from(
-			listElements
-				[toIndex]
+			listElements[toIndex]
 				.querySelectorAll('.ui-treeview-entry > div > input'),
 		) as Array<HTMLElement>;
 		if (nextInput && nextInput.length)
