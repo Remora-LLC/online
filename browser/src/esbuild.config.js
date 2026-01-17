@@ -1,5 +1,5 @@
 const esbuild = require('esbuild');
-const tsconfigPaths = require('esbuild-plugin-tsconfig-paths');
+const tsconfigPathsPlugin = require('esbuild-plugin-tsconfig-paths').default;
 
 esbuild.build({
   entryPoints: ['telemetry-entry.js'],
@@ -8,5 +8,5 @@ esbuild.build({
   globalName: 'TelemetryBundle',
   target: 'es2018',
   outfile: 'src/js/telemetry-embed.js',
-  plugins: [tsconfigPaths()],
+  plugins: [tsconfigPathsPlugin()],
 }).catch(() => process.exit(1));
