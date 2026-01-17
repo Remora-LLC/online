@@ -18,8 +18,7 @@
 
 // import { HazardFlag } from '@remora-llc/protocol/analysis-common';
 
-import { TelemetryClient, WebSocketTransport } from '@remora-llc/telemetry';
-import { initTelemetry } from './telemetry';
+// import { initTelemetry } from './telemetry';
 
 (function (global) {
 
@@ -48,7 +47,7 @@ if (wopiSrc) {
 
 console.log('GLOBAL HOST: ', global.host)
 
-initTelemetry({ fileId, baseUrl: global.host });
+window.initTelemetry({ fileId, baseUrl: global.host });
 
 console.log('[WOPI] Parsed fileId:', fileId);
 console.log('[PARAM] WOPISrc raw:', wopiSrc);
