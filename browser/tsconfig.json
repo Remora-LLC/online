@@ -4,7 +4,6 @@
       "target": "es5",
       "module": "esnext",
       "lib": ["dom", "es2016"],
-      "types": ["node"],
       "sourceMap": false,
       "incremental": true,
       "skipLibCheck": true,
@@ -14,6 +13,9 @@
       "preserveConstEnums": false,
       "downlevelIteration": true,
       "watch": false,
+      "paths": {
+        "@remora-llc/remora-telemetry": ["../../remora-telemetry/dist/index"],
+      },
       "traceResolution": true,
       "esModuleInterop": true,
       "allowSyntheticDefaultImports": true,
