@@ -40,7 +40,8 @@
     "typescript-strict-plugin": "^2.4.4",
     "uglify-js": "3.17.4",
     "uglifycss": "0.0.29",
-    "uglifyify": "5.0.2"
+    "uglifyify": "5.0.2",
+    "undici-types": "5.26.4"
   },
   "repository": {
     "type": "git",
