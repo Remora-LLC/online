@@ -13,6 +13,16 @@
  * local & remote clipboard data.
  */
 
+
+import { trackPasteAction } from '@remora-llc/telemetry';
+import {
+	PasteActionType,
+	PasteCitationStatus,
+	PasteFormatStatus,
+} from '@remora-llc/protocol/analysis-paste';
+
+import { getTelemetry } from "../../telemetry";
+
 /* global app DocUtil _ brandProductName $ ClipboardItem Promise GraphicSelection cool JSDialog */
 /* global globalThis */
 
@@ -1226,18 +1236,15 @@ window.L.Clipboard = window.L.Class.extend({
 			
 			// Record what text was pasted
 			console.log('PASTED TEXT (plain DEBUG):', plainText);
-			// if (globalThis.telemetryReady) {
-            // globalThis.telemetryReady
-            //     .then(telemetry => {
-            //         trackPasteAction(
-            //             telemetry,
-            //             plainText,
-            //             PasteActionType.Internal,
-            //             PasteCitationStatus.Uncited,
-            //             PasteFormatStatus.NotSet
-            //         );
-			// 	}).catch(e => {console.warn('Telemetry failed:', e);});
-			// }
+			const telemetry = getTelemetry();
+			trackPasteAction(
+				telemetry,
+				pastedText,
+				PasteActionType.Internal,
+				PasteCitationStatus.Uncited,
+				PasteFormatStatus.NotSet
+			);
+			
 			if (htmlText) {
 				console.log('PASTED TEXT (html DEBUG):', htmlText);
 			}

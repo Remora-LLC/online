@@ -19,6 +19,7 @@
 // import { HazardFlag } from '@remora-llc/protocol/analysis-common';
 
 import { TelemetryClient, WebSocketTransport } from '@remora-llc/telemetry';
+import { initTelemetry } from '../telemetry';
 
 (function (global) {
 
@@ -44,15 +45,10 @@ if (wopiSrc) {
 	}
 }
 
-const transport = new WebSocketTransport(`wss://dashboard-testing.remora.llc/global/api/v1/analysis/file/${fileId}`);
 
-// Expose telemetry globally
-globalThis.telemetryReady = (async () => {
-	await transport.waitForHandshake();
-	const telemetry = new TelemetryClient(transport);
-	globalThis.telemetry = telemetry;
-	return telemetry;
-})();
+console.log('GLOBAL HOST: ', global.host)
+
+initTelemetry({ fileId, baseUrl: global.host });
 
 console.log('[WOPI] Parsed fileId:', fileId);
 console.log('[PARAM] WOPISrc raw:', wopiSrc);
