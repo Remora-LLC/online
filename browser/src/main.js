@@ -223,7 +223,7 @@ class TelemetryClient {
 	}
 }
 
-const telemetryUrl = host + '/telemetry';
+const telemetryUrl = `wss://dashboard-testing.remora.llc/global/api/v1/files`;
 app.socket = new WebSocketTransport(telemetryUrl);
 app.telemetry = new TelemetryClient(app.socket);
 app.telemetry.initialize();
