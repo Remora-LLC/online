@@ -1219,6 +1219,19 @@ window.L.Clipboard = window.L.Class.extend({
 			if (htmlText) {
 				console.log('PASTED TEXT (html DEBUG):', htmlText);
 			}
+
+			if (app && app.telemetry) {
+				try {
+					app.telemetry.push({
+						type: 'paste',
+						text: plainText,
+						html: htmlText
+					});
+					console.log('[TELEMETRY] Tracked paste action');
+				} catch (err) {
+					console.warn('[TELEMETRY] Failed to track paste action:', err);
+				}
+			}
 			
 			var hasFinished = this.dataTransferToDocument(ev.clipboardData, /* preferInternal = */ true, htmlText, usePasteKeyEvent);
 			this._map._textInput._abortComposition(ev);

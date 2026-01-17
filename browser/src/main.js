@@ -7,7 +7,7 @@
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * file, You can obtain a copy at http://mozilla.org/MPL/2.0/.
  */
 
 /* global globalThis UIManager */
@@ -20,18 +20,17 @@
 
 console.log('[INIT] bundle start');
 
+// ----------------------------
+// WOPI and file parameters
+// ----------------------------
 var wopiParams = {};
 var wopiSrc = global.coolParams.get('WOPISrc');
-
-// Parse file ID from WOPISrc
 var fileId = null;
 
 if (wopiSrc) {
 	try {
 		var url = new URL(wopiSrc);
 		var parts = url.pathname.split('/').filter(Boolean);
-
-		// Expected path: /wopi/files/<fileId>
 		if (parts.length >= 3 && parts[0] === 'wopi' && parts[1] === 'files') {
 			fileId = parts[2];
 		}
@@ -57,12 +56,10 @@ if (wopiSrc !== '' && accessToken !== '') {
 		console.log('[WOPI] no_auth_header enabled');
 		wopiParams.no_auth_header = noAuthHeader;
 	}
-}
-else if (wopiSrc !== '' && accessHeader !== '') {
+} else if (wopiSrc !== '' && accessHeader !== '') {
 	console.log('[WOPI] Using access_header authentication');
 	wopiParams = { 'access_header': accessHeader };
-}
-else {
+} else {
 	console.log('[WOPI] No WOPI authentication parameters applied');
 }
 
@@ -110,8 +107,34 @@ console.log('[DOC] isWopi:', isWopi);
 var notWopiButIframe = !!global.coolParams.get('NotWOPIButIframe');
 console.log('[PARAM] NotWOPIButIframe:', notWopiButIframe);
 
-////// JSON Telemetry / WebSocketTransport //////
+// ----------------------------
+// JSON Telemetry Types
+// ----------------------------
+app.HazardFlag = {
+	Unknown: 0, Paste: 1, Typing: 2, Edit: 3, Window: 4, Nudge: 5, Hardware: 6, Network: 7
+};
 
+app.EditActionType = {
+	NotSet: 0, Replace: 1, Delete: 2, Undo: 3, Redo: 4, Copy: 5, Cut: 6,
+	SelectAll: 7, CopyAll: 8, Bold: 9, Italic: 10, Underline: 11, Strikethrough: 12,
+	Highlight: 13, TextColor: 14, FontSize: 15, FontFamily: 16, MetaEnter: 17,
+	MetaLeftArrow: 18, MetaRightArrow: 19, MetaUpArrow: 20, MetaDownArrow: 21,
+	MetaBackslash: 22, MetaReload: 23
+};
+
+app.PasteActionType = { NotSet: 0, Internal: 1 };
+app.PasteCitationStatus = { NotSet: 0, Uncited: 1, FalseCitation: 2, TrueCitation: 3 };
+app.PasteFormatStatus = { NotSet: 0, Inconsistent: 1 };
+
+app.TypingActionType = { NotSet: 0, Typing: 1, Submit: 2 };
+
+app.WindowState = { NotSet: 0, Focus: 1, Blur: 2, Close: 3, Full: 4 };
+
+app.NudgeContentType = { NotSet: 0, PromptInjection: 1, Malicious: 2, Sensitive: 3 };
+
+// ----------------------------
+// WebSocket Transport
+// ----------------------------
 class WebSocketTransport {
 	constructor(url) {
 		this.url = url;
@@ -119,7 +142,6 @@ class WebSocketTransport {
 		this.queue = [];
 		this.connected = false;
 		this.startingActionId = 1;
-
 		this.init();
 	}
 
@@ -131,11 +153,13 @@ class WebSocketTransport {
 			this.flushQueue();
 		});
 		this.ws.addEventListener('message', (evt) => {
-			const msg = JSON.parse(evt.data);
-			if (msg.type === 'hello' && msg.startingActionId !== undefined) {
-				this.startingActionId = msg.startingActionId;
-				console.log('[WS] Starting action ID:', this.startingActionId);
-			}
+			try {
+				const msg = JSON.parse(evt.data);
+				if (msg.type === 'hello' && msg.startingActionId !== undefined) {
+					this.startingActionId = msg.startingActionId;
+					console.log('[WS] Starting action ID:', this.startingActionId);
+				}
+			} catch (e) {}
 		});
 		this.ws.addEventListener('close', () => {
 			console.log('[WS] Closed, reconnecting...');
@@ -144,7 +168,7 @@ class WebSocketTransport {
 		});
 	}
 
-	async flushQueue() {
+	flushQueue() {
 		while (this.queue.length > 0 && this.connected) {
 			const { action, actionId } = this.queue.shift();
 			this.sendJSON(action, actionId);
@@ -152,11 +176,7 @@ class WebSocketTransport {
 	}
 
 	sendJSON(action, actionId) {
-		const payload = JSON.stringify({
-			actionId,
-			timestamp: Date.now(),
-			...action
-		});
+		const payload = JSON.stringify(Object.assign({ actionId: actionId, timestamp: Date.now() }, action));
 		if (this.connected) {
 			this.ws.send(payload);
 		} else {
@@ -164,7 +184,7 @@ class WebSocketTransport {
 		}
 	}
 
-	async send(action) {
+	send(action) {
 		const id = this.startingActionId++;
 		if (this.connected) {
 			this.sendJSON(action, id);
@@ -178,43 +198,74 @@ class WebSocketTransport {
 	}
 }
 
+// ----------------------------
+// Telemetry Client
+// ----------------------------
 class TelemetryClient {
 	constructor(transport) {
 		this.transport = transport;
 		this.nextActionId = 1;
 	}
 
-	async initialize() {
+	initialize() {
 		this.nextActionId = this.transport.startingActionId;
 	}
 
-	async push(action) {
-		await this.transport.send(action);
+	push(action) {
+		this.transport.send(action);
 		this.nextActionId++;
 	}
 
-	async shutdown() {
+	shutdown() {
 		this.transport.close();
 	}
 }
 
-// Example usage: track actions
 const telemetryUrl = host + '/telemetry';
 app.socket = new WebSocketTransport(telemetryUrl);
 app.telemetry = new TelemetryClient(app.socket);
-app.telemetry.initialize().then(() => console.log('[TELEMETRY] Initialized'));
+app.telemetry.initialize();
+console.log('[TELEMETRY] Initialized');
 
 function trackEditAction(type) {
-	app.telemetry.push({ type: 'edit', editType: type });
+	app.telemetry.push({ hazard: app.HazardFlag.Edit, type: 'Edit', action_type: type });
 }
-function trackPasteAction(text) {
-	app.telemetry.push({ type: 'paste', text });
+function trackPasteAction(text, actionType, cited, format) {
+	app.telemetry.push({
+		hazard: app.HazardFlag.Paste,
+		type: 'Paste',
+		text,
+		action_type: actionType,
+		cited,
+		format
+	});
 }
-function trackTypingAction(text, wpm, cpm) {
-	app.telemetry.push({ type: 'typing', text, wpm, cpm });
+function trackTypingAction(text, wpm, cpm, actionType) {
+	app.telemetry.push({
+		hazard: app.HazardFlag.Typing,
+		type: 'Typing',
+		text,
+		wpm,
+		cpm,
+		action_type: actionType
+	});
 }
 function trackWindowAction(state, sizePct) {
-	app.telemetry.push({ type: 'window', state, sizePct });
+	app.telemetry.push({
+		hazard: app.HazardFlag.Window,
+		type: 'Window',
+		window_state: state,
+		size_percentage: sizePct
+	});
+}
+function trackNudgeAction(accept, contentType, text) {
+	app.telemetry.push({
+		hazard: app.HazardFlag.Nudge,
+		type: 'Nudge',
+		accept_message: accept,
+		content_type: contentType,
+		text
+	});
 }
 
 ////// Map Creation //////
@@ -303,11 +354,11 @@ if (window.ThisIsTheEmscriptenApp) {
 		isWopi ? encodedWOPI : docURL
 	);
 
-	globalThis.Module = createEmscriptenModule(isWopi ? 'server' : 'local', isWopi ? encodedWOPI : docURL);
-	globalThis.Module.onRuntimeInitialized = function() {
+	globalThis.Module.onRuntimeInitialized = function () {
 		console.log('[EMS] Runtime initialized, loading document');
 		map.loadDocument(global.socket);
 	};
+
 	createOnlineModule(globalThis.Module);
 } else {
 	console.log('[MAP] Loading document directly');
@@ -343,4 +394,4 @@ if (uaLowerCase.indexOf('msie') != -1 || uaLowerCase.indexOf('trident') != -1) {
 	);
 }
 
-}(window));
+})(window);
