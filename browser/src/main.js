@@ -16,8 +16,6 @@
 /* global ServerConnectionService createEmscriptenModule */
 /*eslint indent: [error, "tab", { "outerIIFEBody": 0 }]*/
 
-import { TelemetryClient, WebSocketTransport } from '@remora-llc/telemetry';
-
 (function (global) {
 
 console.log('[INIT] bundle start');
@@ -28,9 +26,9 @@ var wopiSrc = global.coolParams.get('WOPISrc');
 // Parse file ID from WOPISrc
 var fileId = null;
 
-if (wopiSrcRaw) {
+if (wopiSrc) {
 	try {
-		var url = new URL(wopiSrcRaw);
+		var url = new URL(wopiSrc);
 		var parts = url.pathname.split('/').filter(Boolean);
 
 		// Expected path: /wopi/files/<fileId>
@@ -93,7 +91,7 @@ console.log('[PARAM] debug:', debugMode);
 var docURL, docParams;
 var isWopi = false;
 
-if (wopiSrc != '') {
+if (wopiSrc) {
 	docURL = decodeURIComponent(wopiSrc);
 	docParams = wopiParams;
 	isWopi = true;
@@ -109,38 +107,147 @@ if (wopiSrc != '') {
 console.log('[DOC] docParams:', docParams);
 console.log('[DOC] isWopi:', isWopi);
 
-var notWopiButIframe = global.coolParams.get('NotWOPIButIframe') != '';
+var notWopiButIframe = !!global.coolParams.get('NotWOPIButIframe');
 console.log('[PARAM] NotWOPIButIframe:', notWopiButIframe);
+
+////// JSON Telemetry / WebSocketTransport //////
+
+class WebSocketTransport {
+	constructor(url) {
+		this.url = url;
+		this.ws = null;
+		this.queue = [];
+		this.connected = false;
+		this.startingActionId = 1;
+
+		this.init();
+	}
+
+	init() {
+		this.ws = new WebSocket(this.url);
+		this.ws.addEventListener('open', () => {
+			console.log('[WS] Connected');
+			this.connected = true;
+			this.flushQueue();
+		});
+		this.ws.addEventListener('message', (evt) => {
+			const msg = JSON.parse(evt.data);
+			if (msg.type === 'hello' && msg.startingActionId !== undefined) {
+				this.startingActionId = msg.startingActionId;
+				console.log('[WS] Starting action ID:', this.startingActionId);
+			}
+		});
+		this.ws.addEventListener('close', () => {
+			console.log('[WS] Closed, reconnecting...');
+			this.connected = false;
+			setTimeout(() => this.init(), 1000);
+		});
+	}
+
+	async flushQueue() {
+		while (this.queue.length > 0 && this.connected) {
+			const { action, actionId } = this.queue.shift();
+			this.sendJSON(action, actionId);
+		}
+	}
+
+	sendJSON(action, actionId) {
+		const payload = JSON.stringify({
+			actionId,
+			timestamp: Date.now(),
+			...action
+		});
+		if (this.connected) {
+			this.ws.send(payload);
+		} else {
+			this.queue.push({ action, actionId });
+		}
+	}
+
+	async send(action) {
+		const id = this.startingActionId++;
+		if (this.connected) {
+			this.sendJSON(action, id);
+		} else {
+			this.queue.push({ action, actionId: id });
+		}
+	}
+
+	close() {
+		this.ws.close();
+	}
+}
+
+class TelemetryClient {
+	constructor(transport) {
+		this.transport = transport;
+		this.nextActionId = 1;
+	}
+
+	async initialize() {
+		this.nextActionId = this.transport.startingActionId;
+	}
+
+	async push(action) {
+		await this.transport.send(action);
+		this.nextActionId++;
+	}
+
+	async shutdown() {
+		this.transport.close();
+	}
+}
+
+// Example usage: track actions
+const telemetryUrl = host + '/telemetry';
+app.socket = new WebSocketTransport(telemetryUrl);
+app.telemetry = new TelemetryClient(app.socket);
+app.telemetry.initialize().then(() => console.log('[TELEMETRY] Initialized'));
+
+function trackEditAction(type) {
+	app.telemetry.push({ type: 'edit', editType: type });
+}
+function trackPasteAction(text) {
+	app.telemetry.push({ type: 'paste', text });
+}
+function trackTypingAction(text, wpm, cpm) {
+	app.telemetry.push({ type: 'typing', text, wpm, cpm });
+}
+function trackWindowAction(state, sizePct) {
+	app.telemetry.push({ type: 'window', state, sizePct });
+}
+
+////// Map Creation //////
 
 console.log('[MAP] Creating map with options:', {
 	server: host,
 	doc: docURL,
-	docParams: docParams,
-	timestamp: timestamp,
+	docParams,
+	timestamp,
 	docTarget: target,
 	debug: debugMode,
 	wopi: isWopi,
-	wopiSrc: wopiSrc,
-	notWopiButIframe: notWopiButIframe,
-	alwaysActive: alwaysActive,
-	idleTimeoutSecs: idleTimeoutSecs,
-	outOfFocusTimeoutSecs: outOfFocusTimeoutSecs
+	wopiSrc,
+	notWopiButIframe,
+	alwaysActive,
+	idleTimeoutSecs,
+	outOfFocusTimeoutSecs
 });
 
 var map = window.L.map('map', {
 	server: host,
 	doc: docURL,
-	docParams: docParams,
-	timestamp: timestamp,
+	docParams,
+	timestamp,
 	docTarget: target,
 	documentContainer: 'document-container',
 	debug: debugMode,
 	wopi: isWopi,
-	wopiSrc: wopiSrc,
-	notWopiButIframe: notWopiButIframe,
-	alwaysActive: alwaysActive,
-	idleTimeoutSecs: idleTimeoutSecs,
-	outOfFocusTimeoutSecs: outOfFocusTimeoutSecs,
+	wopiSrc,
+	notWopiButIframe,
+	alwaysActive,
+	idleTimeoutSecs,
+	outOfFocusTimeoutSecs
 });
 
 ////// Controls /////
@@ -179,7 +286,6 @@ app.idleHandler.map = map;
 
 if (window.ThisIsTheEmscriptenApp) {
 	console.log('[EMS] Running in Emscripten mode');
-
 	var docParamsString = $.param(docParams);
 	console.log('[EMS] docParamsString:', docParamsString);
 
@@ -197,11 +303,11 @@ if (window.ThisIsTheEmscriptenApp) {
 		isWopi ? encodedWOPI : docURL
 	);
 
+	globalThis.Module = createEmscriptenModule(isWopi ? 'server' : 'local', isWopi ? encodedWOPI : docURL);
 	globalThis.Module.onRuntimeInitialized = function() {
 		console.log('[EMS] Runtime initialized, loading document');
 		map.loadDocument(global.socket);
 	};
-
 	createOnlineModule(globalThis.Module);
 } else {
 	console.log('[MAP] Loading document directly');
