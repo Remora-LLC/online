@@ -27,6 +27,97 @@ class StatusBar extends JSDialog.Toolbar {
 		map.on('zoomend', this.onZoomEnd, this);
 		map.on('initmodificationindicator', this.onInitModificationIndicator, this);
 		map.on('updatemodificationindicator', this.onUpdateModificationIndicator, this);
+
+		// CPM/WPM tracking initialization
+		this._typingMetrics = {
+			characters: 0,
+			words: 0,
+			startTime: null,
+			lastUpdateTime: null,
+			updateInterval: null
+		};
+
+		// Bind typing event listeners
+		this._initializeTypingTracking();
+	}
+
+	_initializeTypingTracking() {
+		// Listen for text input events
+		this.map.on('textinput', this._onTextInput, this);
+		this.map.on('keydown', this._onKeyDown, this);
+		
+		// Log metrics to console every second
+		this._typingMetrics.updateInterval = setInterval(() => {
+			this._logTypingMetrics();
+		}, 1000);
+	}
+
+	_onTextInput(e) {
+		if (!this._typingMetrics.startTime) {
+			this._typingMetrics.startTime = Date.now();
+		}
+		this._typingMetrics.lastUpdateTime = Date.now();
+		
+		// Count characters (including spaces)
+		if (e.text) {
+			this._typingMetrics.characters += e.text.length;
+			// Simple word count: split by spaces
+			const words = e.text.trim().split(/\s+/).filter(w => w.length > 0);
+			this._typingMetrics.words += words.length;
+		}
+	}
+
+	_onKeyDown(e) {
+		// Track backspace/delete as negative input
+		if (e.keyCode === 8 || e.keyCode === 46) { // Backspace or Delete
+			if (!this._typingMetrics.startTime) {
+				this._typingMetrics.startTime = Date.now();
+			}
+			this._typingMetrics.lastUpdateTime = Date.now();
+			this._typingMetrics.characters = Math.max(0, this._typingMetrics.characters - 1);
+		}
+	}
+
+	_calculateCPM() {
+		if (!this._typingMetrics.startTime) return 0;
+		
+		const elapsedMinutes = (Date.now() - this._typingMetrics.startTime) / 60000;
+		if (elapsedMinutes === 0) return 0;
+		
+		return Math.round(this._typingMetrics.characters / elapsedMinutes);
+	}
+
+	_calculateWPM() {
+		if (!this._typingMetrics.startTime) return 0;
+		
+		const elapsedMinutes = (Date.now() - this._typingMetrics.startTime) / 60000;
+		if (elapsedMinutes === 0) return 0;
+		
+		return Math.round(this._typingMetrics.words / elapsedMinutes);
+	}
+
+	_logTypingMetrics() {
+		// Reset if inactive for more than 5 seconds
+		if (this._typingMetrics.lastUpdateTime && 
+		    (Date.now() - this._typingMetrics.lastUpdateTime > 5000)) {
+			this._resetTypingMetrics();
+			return;
+		}
+
+		const cpm = this._calculateCPM();
+		const wpm = this._calculateWPM();
+		
+		if (cpm > 0 || wpm > 0) {
+			console.log(`Typing Speed - WPM: ${wpm}, CPM: ${cpm}`);
+		}
+	}
+
+	_resetTypingMetrics() {
+		this._typingMetrics.characters = 0;
+		this._typingMetrics.words = 0;
+		this._typingMetrics.startTime = null;
+		this._typingMetrics.lastUpdateTime = null;
+		console.log('Typing metrics reset due to inactivity');
 	}
 
 	isSaveIndicatorActive() {
