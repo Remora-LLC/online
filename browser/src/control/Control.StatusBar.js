@@ -34,7 +34,10 @@ class StatusBar extends JSDialog.Toolbar {
 			words: 0,
 			startTime: null,
 			lastUpdateTime: null,
-			updateInterval: null
+			updateInterval: null,
+			lastCalcTime: null,
+			lastCalcChars: 0,
+			lastCalcWords: 0
 		};
 
 		// Bind typing event listeners
@@ -46,10 +49,8 @@ class StatusBar extends JSDialog.Toolbar {
 		const docContainer = document.getElementById('document-container');
 		
 		if (docContainer) {
-			// Listen for actual keyboard events on the document container
-			docContainer.addEventListener('keypress', this._onKeyPress.bind(this));
-			docContainer.addEventListener('keydown', this._onKeyDownDOM.bind(this));
 			docContainer.addEventListener('input', this._onInputDOM.bind(this));
+			docContainer.addEventListener('keydown', this._onKeyDownDOM.bind(this));
 		}
 		
 		// Also try the map's text input div
@@ -58,42 +59,22 @@ class StatusBar extends JSDialog.Toolbar {
 			textInputDiv.addEventListener('input', this._onInputDOM.bind(this));
 		}
 		
-		// Log metrics to console every second
+		// Calculate actual WPM/CPM every 60 seconds
 		this._typingMetrics.updateInterval = setInterval(() => {
-			this._logTypingMetrics();
-		}, 1000);
+			this._calculateAndLogTypingSpeed();
+		}, 60000); // 60 seconds
 		
-		console.log('Typing tracking initialized');
-	}
-
-	_onKeyPress(e) {
-		console.log('KeyPress detected:', e.key);
-		
-		if (!this._typingMetrics.startTime) {
-			this._typingMetrics.startTime = Date.now();
-		}
-		this._typingMetrics.lastUpdateTime = Date.now();
-		
-		// Count printable characters
-		if (e.key && e.key.length === 1) {
-			this._typingMetrics.characters++;
-			
-			// Count words (space indicates word completion)
-			if (e.key === ' ') {
-				this._typingMetrics.words++;
-			}
-		}
+		console.log('Typing tracking initialized - will report every 60 seconds');
 	}
 
 	_onInputDOM(e) {
-		console.log('Input event detected:', e);
-		
 		if (!this._typingMetrics.startTime) {
 			this._typingMetrics.startTime = Date.now();
+			this._typingMetrics.lastCalcTime = Date.now();
 		}
 		this._typingMetrics.lastUpdateTime = Date.now();
 		
-		// Actually count the characters!
+		// Count the characters
 		if (e.data) {
 			this._typingMetrics.characters += e.data.length;
 			
@@ -101,56 +82,27 @@ class StatusBar extends JSDialog.Toolbar {
 			if (e.data === ' ') {
 				this._typingMetrics.words++;
 			} else if (e.data.includes(' ')) {
-				// If pasting multiple words
 				const words = e.data.trim().split(/\s+/).filter(w => w.length > 0);
 				this._typingMetrics.words += words.length;
 			}
-			
-			// Log immediately for debugging
-			const cpm = this._calculateCPM();
-			const wpm = this._calculateWPM();
-			console.log(`Current - WPM: ${wpm}, CPM: ${cpm}, Total chars: ${this._typingMetrics.characters}, Total words: ${this._typingMetrics.words}`);
 		}
 		
 		// Handle deletions
 		if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
 			this._typingMetrics.characters = Math.max(0, this._typingMetrics.characters - 1);
-			console.log(`Character deleted. Remaining: ${this._typingMetrics.characters}`);
 		}
 	}
 
 	_onKeyDownDOM(e) {
-		console.log('KeyDown detected:', e.key, e.keyCode);
-		
-		// Track backspace/delete
-		if (e.keyCode === 8 || e.keyCode === 46) {
-			if (!this._typingMetrics.startTime) {
-				this._typingMetrics.startTime = Date.now();
-			}
-			this._typingMetrics.lastUpdateTime = Date.now();
-			// Note: actual deletion counting is handled in _onInputDOM
+		// Track activity
+		if (!this._typingMetrics.startTime) {
+			this._typingMetrics.startTime = Date.now();
+			this._typingMetrics.lastCalcTime = Date.now();
 		}
+		this._typingMetrics.lastUpdateTime = Date.now();
 	}
 
-	_calculateCPM() {
-		if (!this._typingMetrics.startTime) return 0;
-		
-		const elapsedMinutes = (Date.now() - this._typingMetrics.startTime) / 60000;
-		if (elapsedMinutes === 0) return 0;
-		
-		return Math.round(this._typingMetrics.characters / elapsedMinutes);
-	}
-
-	_calculateWPM() {
-		if (!this._typingMetrics.startTime) return 0;
-		
-		const elapsedMinutes = (Date.now() - this._typingMetrics.startTime) / 60000;
-		if (elapsedMinutes === 0) return 0;
-		
-		return Math.round(this._typingMetrics.words / elapsedMinutes);
-	}
-
-	_logTypingMetrics() {
+	_calculateAndLogTypingSpeed() {
 		// Reset if inactive for more than 5 seconds
 		if (this._typingMetrics.lastUpdateTime && 
 			(Date.now() - this._typingMetrics.lastUpdateTime > 5000)) {
@@ -158,11 +110,23 @@ class StatusBar extends JSDialog.Toolbar {
 			return;
 		}
 
-		const cpm = this._calculateCPM();
-		const wpm = this._calculateWPM();
+		// Only calculate if we have a previous calculation time
+		if (!this._typingMetrics.lastCalcTime) {
+			return;
+		}
+
+		// Calculate characters and words typed in the last 60 seconds
+		const charsInLastMinute = this._typingMetrics.characters - this._typingMetrics.lastCalcChars;
+		const wordsInLastMinute = this._typingMetrics.words - this._typingMetrics.lastCalcWords;
 		
-		if (cpm > 0 || wpm > 0) {
-			console.log(`📊 Typing Speed - WPM: ${wpm}, CPM: ${cpm}`);
+		// Update for next calculation
+		this._typingMetrics.lastCalcChars = this._typingMetrics.characters;
+		this._typingMetrics.lastCalcWords = this._typingMetrics.words;
+		this._typingMetrics.lastCalcTime = Date.now();
+		
+		if (charsInLastMinute > 0 || wordsInLastMinute > 0) {
+			console.log(`📊 Last 60 seconds - WPM: ${wordsInLastMinute}, CPM: ${charsInLastMinute}`);
+			console.log(`   Total session - Words: ${this._typingMetrics.words}, Characters: ${this._typingMetrics.characters}`);
 		}
 	}
 
@@ -171,6 +135,9 @@ class StatusBar extends JSDialog.Toolbar {
 		this._typingMetrics.words = 0;
 		this._typingMetrics.startTime = null;
 		this._typingMetrics.lastUpdateTime = null;
+		this._typingMetrics.lastCalcTime = null;
+		this._typingMetrics.lastCalcChars = 0;
+		this._typingMetrics.lastCalcWords = 0;
 		console.log('Typing metrics reset due to inactivity');
 	}
 	isSaveIndicatorActive() {
