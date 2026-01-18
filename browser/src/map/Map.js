@@ -1499,7 +1499,6 @@ window.L.Map = window.L.Evented.extend({
 	},
 
 	_onWindowResize: function () {
-		try {
 			// test remove
 			var iframeWidth = this._container.clientWidth;
 			var iframeHeight = this._container.clientHeight;
@@ -1510,8 +1509,7 @@ window.L.Map = window.L.Evented.extend({
 			var heightPercent = Math.round((iframeHeight / screenHeight) * 100);
 			console.log("PERCENT WIDTH: " + widthPercent + " HEIGHT: " + heightPercent);
 			// ------------------------------------------
-
-
+		try {
 			var parentWidth = window.top.innerWidth;
 			var parentHeight = window.top.innerHeight;
 			// realistically this shouldn't happen so don't worry about it
