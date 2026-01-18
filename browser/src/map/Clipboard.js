@@ -1214,24 +1214,34 @@ window.L.Clipboard = window.L.Class.extend({
 			var htmlText = ev.clipboardData.getData('text/html');
 			var plainText = ev.clipboardData.getData('text/plain');
 			
+			if (app && app.telemetry) {
+			// For right now, we don't have the paste-cite feature yet, but we can roll it out later...
+
 			// Record what text was pasted
 			console.log('PASTED TEXT (plain DEBUG):', plainText);
-			if (htmlText) {
-				console.log('PASTED TEXT (html DEBUG):', htmlText);
-			}
-
-			if (app && app.telemetry) {
 				try {
-					app.telemetry.push({
-						type: 'paste',
-						text: plainText,
-						html: htmlText
-					});
+					// DRN IMPLEMENT
+					// app.trackPasteAction(plainText, actionType, true, format)
+
+
+					// app.telemetry.push({
+					// 	type: 'paste',
+					// 	text: plainText,
+					// 	html: htmlText
+					// });
 					console.log('[TELEMETRY] Tracked paste action');
 				} catch (err) {
 					console.warn('[TELEMETRY] Failed to track paste action:', err);
 				}
+			
+			
+				if (htmlText) {
+					console.log('PASTED TEXT (html DEBUG):', htmlText);
+					// DRN IMPLEMENT
+					// app.trackPasteAction(htmlText, actionType, true, format)
+				}
 			}
+
 			
 			var hasFinished = this.dataTransferToDocument(ev.clipboardData, /* preferInternal = */ true, htmlText, usePasteKeyEvent);
 			this._map._textInput._abortComposition(ev);
