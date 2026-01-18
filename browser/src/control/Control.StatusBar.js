@@ -103,31 +103,23 @@ class StatusBar extends JSDialog.Toolbar {
 	}
 
 	_calculateAndLogTypingSpeed() {
-		// Reset if inactive for more than 5 seconds
-		if (this._typingMetrics.lastUpdateTime && 
-			(Date.now() - this._typingMetrics.lastUpdateTime > 5000)) {
-			this._resetTypingMetrics();
-			return;
-		}
-
-		// Only calculate if we have a previous calculation time
+		// Only calculate if we have started typing
 		if (!this._typingMetrics.lastCalcTime) {
 			return;
 		}
 
 		// Calculate characters and words typed in the last 60 seconds
-		const charsInLastMinute = this._typingMetrics.characters - this._typingMetrics.lastCalcChars;
-		const wordsInLastMinute = this._typingMetrics.words - this._typingMetrics.lastCalcWords;
+		const CPM = this._typingMetrics.characters - this._typingMetrics.lastCalcChars;
+		const WPM = this._typingMetrics.words - this._typingMetrics.lastCalcWords;
+		
+		// Always log, even if 0
+		console.log(`📊 Last 60 seconds - WPM: ${WPM}, CPM: ${CPM}`);
+		console.log(`   Total session - Words: ${this._typingMetrics.words}, Characters: ${this._typingMetrics.characters}`);
 		
 		// Update for next calculation
 		this._typingMetrics.lastCalcChars = this._typingMetrics.characters;
 		this._typingMetrics.lastCalcWords = this._typingMetrics.words;
 		this._typingMetrics.lastCalcTime = Date.now();
-		
-		if (charsInLastMinute > 0 || wordsInLastMinute > 0) {
-			console.log(`📊 Last 60 seconds - WPM: ${wordsInLastMinute}, CPM: ${charsInLastMinute}`);
-			console.log(`   Total session - Words: ${this._typingMetrics.words}, Characters: ${this._typingMetrics.characters}`);
-		}
 	}
 
 	_resetTypingMetrics() {
@@ -138,7 +130,7 @@ class StatusBar extends JSDialog.Toolbar {
 		this._typingMetrics.lastCalcTime = null;
 		this._typingMetrics.lastCalcChars = 0;
 		this._typingMetrics.lastCalcWords = 0;
-		console.log('Typing metrics reset due to inactivity');
+		console.log('Typing metrics reset');
 	}
 	isSaveIndicatorActive() {
 		return window.useStatusbarSaveIndicator;
