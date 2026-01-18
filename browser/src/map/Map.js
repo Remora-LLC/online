@@ -1411,6 +1411,7 @@ window.L.Map = window.L.Evented.extend({
 
 		window.L.DomEvent[onOff](window, 'blur', this._onLostFocus, this);
 		window.L.DomEvent[onOff](window, 'focus', this._onGotFocus, this);
+		window.L.DomEvent[onOff](window, 'resize', this._onWindowResize, this);
 	},
 
 
@@ -1484,6 +1485,19 @@ window.L.Map = window.L.Evented.extend({
 			this._onEditorGotFocus();
 		} else {
 			this._changeFocusWidget(e.dialog, e.winId, e.acceptInput);
+		}
+	},
+	
+	_onWindowResize: function () {
+		try {
+			var parentWidth = window.top.innerWidth;
+			var parentHeight = window.top.innerHeight;
+			console.log('WINDOW SIZE CHANGED: ' + parentWidth + 'x' + parentHeight + ' (parent) DEBUG');
+		} catch (e) {
+			// CORS restriction - can't access parent window
+			var width = this._container.clientWidth;
+			var height = this._container.clientHeight;
+			console.log('WINDOW SIZE CHANGED: ' + width + 'x' + height + ' (iframe) DEBUG');
 		}
 	},
 
