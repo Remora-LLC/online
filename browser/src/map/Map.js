@@ -1495,29 +1495,29 @@ window.L.Map = window.L.Evented.extend({
 	},
 
 	_onWindowResize: function () {
-			// test remove
-			var iframeWidth = this._container.clientWidth;
-			var iframeHeight = this._container.clientHeight;
-			
-			var windowWidth = window.innerWidth;
-			var windowHeight = window.innerHeight;
+		var iframeWidth = this._container.clientWidth;
+		var iframeHeight = this._container.clientHeight;
+
+		try {
+			// Get the parent window's dimensions (the actual browser window)
+			var windowWidth = window.parent.innerWidth;
+			var windowHeight = window.parent.innerHeight;
 			var widthPercent = Math.round((iframeWidth / windowWidth) * 100);
 			var heightPercent = Math.round((iframeHeight / windowHeight) * 100);
 			
 			console.log('PERCENT WIDTH: ' + widthPercent + ' HEIGHT: ' + heightPercent + 
 						' (iframe: ' + iframeWidth + 'x' + iframeHeight + 
-						' window: ' + windowWidth + 'x' + windowHeight + ')');
-
-			// ------------------------------------------
-		try {
-			var parentWidth = window.top.innerWidth;
-			var parentHeight = window.top.innerHeight;
-			// realistically this shouldn't happen so don't worry about it
-			console.log('WINDOW SIZE CHANGED: ' + parentWidth + 'x' + parentHeight + ' (parent) DEBUG');
+						' parent window: ' + windowWidth + 'x' + windowHeight + ')');
 		} catch (e) {
-			var width = this._container.clientWidth;
-			var height = this._container.clientHeight;			
-			console.log('WINDOW SIZE CHANGED: ' + width + 'x' + height + ' (iframe) DEBUG');
+			// If CORS blocks access to parent, fall back to screen resolution
+			var screenWidth = window.screen.width;
+			var screenHeight = window.screen.height;
+			var widthPercent = Math.round((iframeWidth / screenWidth) * 100);
+			var heightPercent = Math.round((iframeHeight / screenHeight) * 100);
+			
+			console.log('PERCENT WIDTH: ' + widthPercent + ' HEIGHT: ' + heightPercent + 
+						' (iframe: ' + iframeWidth + 'x' + iframeHeight + 
+						' screen: ' + screenWidth + 'x' + screenHeight + ')');
 		}
 	},
 
