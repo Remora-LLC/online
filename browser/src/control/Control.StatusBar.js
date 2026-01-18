@@ -92,6 +92,31 @@ class StatusBar extends JSDialog.Toolbar {
 			this._typingMetrics.startTime = Date.now();
 		}
 		this._typingMetrics.lastUpdateTime = Date.now();
+		
+		// Actually count the characters!
+		if (e.data) {
+			this._typingMetrics.characters += e.data.length;
+			
+			// Count words - if the input is a space or contains spaces
+			if (e.data === ' ') {
+				this._typingMetrics.words++;
+			} else if (e.data.includes(' ')) {
+				// If pasting multiple words
+				const words = e.data.trim().split(/\s+/).filter(w => w.length > 0);
+				this._typingMetrics.words += words.length;
+			}
+			
+			// Log immediately for debugging
+			const cpm = this._calculateCPM();
+			const wpm = this._calculateWPM();
+			console.log(`Current - WPM: ${wpm}, CPM: ${cpm}, Total chars: ${this._typingMetrics.characters}, Total words: ${this._typingMetrics.words}`);
+		}
+		
+		// Handle deletions
+		if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+			this._typingMetrics.characters = Math.max(0, this._typingMetrics.characters - 1);
+			console.log(`Character deleted. Remaining: ${this._typingMetrics.characters}`);
+		}
 	}
 
 	_onKeyDownDOM(e) {
@@ -103,8 +128,50 @@ class StatusBar extends JSDialog.Toolbar {
 				this._typingMetrics.startTime = Date.now();
 			}
 			this._typingMetrics.lastUpdateTime = Date.now();
-			this._typingMetrics.characters = Math.max(0, this._typingMetrics.characters - 1);
+			// Note: actual deletion counting is handled in _onInputDOM
 		}
+	}
+
+	_calculateCPM() {
+		if (!this._typingMetrics.startTime) return 0;
+		
+		const elapsedMinutes = (Date.now() - this._typingMetrics.startTime) / 60000;
+		if (elapsedMinutes === 0) return 0;
+		
+		return Math.round(this._typingMetrics.characters / elapsedMinutes);
+	}
+
+	_calculateWPM() {
+		if (!this._typingMetrics.startTime) return 0;
+		
+		const elapsedMinutes = (Date.now() - this._typingMetrics.startTime) / 60000;
+		if (elapsedMinutes === 0) return 0;
+		
+		return Math.round(this._typingMetrics.words / elapsedMinutes);
+	}
+
+	_logTypingMetrics() {
+		// Reset if inactive for more than 5 seconds
+		if (this._typingMetrics.lastUpdateTime && 
+			(Date.now() - this._typingMetrics.lastUpdateTime > 5000)) {
+			this._resetTypingMetrics();
+			return;
+		}
+
+		const cpm = this._calculateCPM();
+		const wpm = this._calculateWPM();
+		
+		if (cpm > 0 || wpm > 0) {
+			console.log(`📊 Typing Speed - WPM: ${wpm}, CPM: ${cpm}`);
+		}
+	}
+
+	_resetTypingMetrics() {
+		this._typingMetrics.characters = 0;
+		this._typingMetrics.words = 0;
+		this._typingMetrics.startTime = null;
+		this._typingMetrics.lastUpdateTime = null;
+		console.log('Typing metrics reset due to inactivity');
 	}
 	isSaveIndicatorActive() {
 		return window.useStatusbarSaveIndicator;
