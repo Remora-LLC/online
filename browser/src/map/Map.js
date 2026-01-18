@@ -1445,8 +1445,6 @@ window.L.Map = window.L.Evented.extend({
 
 	// Our browser tab lost focus.
 	_onLostFocus: function () {
-		var width = this._container.clientWidth;
-		var height = this._container.clientHeight;
 		// DRN IMPLEMENT
 		//app.trackWindowAction(WindowState.Blurred, x);
 	
@@ -1466,8 +1464,6 @@ window.L.Map = window.L.Evented.extend({
 
 	// Our browser tab got focus.
 	_onGotFocus: function () {
-		var width = this._container.clientWidth;
-		var height = this._container.clientHeight;
 		// DRN IMPLEMENT
 		//app.trackWindowAction(WindowState.Focused, x);
 
@@ -1503,11 +1499,15 @@ window.L.Map = window.L.Evented.extend({
 			var iframeWidth = this._container.clientWidth;
 			var iframeHeight = this._container.clientHeight;
 			
-			var screenWidth = window.screen.width;
-			var screenHeight = window.screen.height;
-			var widthPercent = Math.round((iframeWidth / screenWidth) * 100);
-			var heightPercent = Math.round((iframeHeight / screenHeight) * 100);
-			console.log("PERCENT WIDTH: " + widthPercent + " HEIGHT: " + heightPercent);
+			var windowWidth = window.innerWidth;
+			var windowHeight = window.innerHeight;
+			var widthPercent = Math.round((iframeWidth / windowWidth) * 100);
+			var heightPercent = Math.round((iframeHeight / windowHeight) * 100);
+			
+			console.log('PERCENT WIDTH: ' + widthPercent + ' HEIGHT: ' + heightPercent + 
+						' (iframe: ' + iframeWidth + 'x' + iframeHeight + 
+						' window: ' + windowWidth + 'x' + windowHeight + ')');
+
 			// ------------------------------------------
 		try {
 			var parentWidth = window.top.innerWidth;
