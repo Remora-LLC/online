@@ -115,6 +115,9 @@ class StatusBar extends JSDialog.Toolbar {
 		// Always log, even if 0
 		console.log(`📊 Last 60 seconds - WPM: ${WPM}, CPM: ${CPM}`);
 		console.log(`   Total session - Words: ${this._typingMetrics.words}, Characters: ${this._typingMetrics.characters}`);
+
+		// DRN IMPLEMENT
+		//app.trackTypingAction(text, WPM, CPM, actionType)
 		
 		// Update for next calculation
 		this._typingMetrics.lastCalcChars = this._typingMetrics.characters;
