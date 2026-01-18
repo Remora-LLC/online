@@ -42,34 +42,63 @@ class StatusBar extends JSDialog.Toolbar {
 	}
 
 	_initializeTypingTracking() {
-		// Listen for text input events
-		this.map.on('textinput', this._onTextInput, this);
-		this.map.on('keydown', this._onKeyDown, this);
+		// Get the document container where typing actually happens
+		const docContainer = document.getElementById('document-container');
+		
+		if (docContainer) {
+			// Listen for actual keyboard events on the document container
+			docContainer.addEventListener('keypress', this._onKeyPress.bind(this));
+			docContainer.addEventListener('keydown', this._onKeyDownDOM.bind(this));
+			docContainer.addEventListener('input', this._onInputDOM.bind(this));
+		}
+		
+		// Also try the map's text input div
+		const textInputDiv = document.getElementById('clipboardcontainer');
+		if (textInputDiv) {
+			textInputDiv.addEventListener('input', this._onInputDOM.bind(this));
+		}
 		
 		// Log metrics to console every second
 		this._typingMetrics.updateInterval = setInterval(() => {
 			this._logTypingMetrics();
 		}, 1000);
+		
+		console.log('Typing tracking initialized');
 	}
 
-	_onTextInput(e) {
+	_onKeyPress(e) {
+		console.log('KeyPress detected:', e.key);
+		
 		if (!this._typingMetrics.startTime) {
 			this._typingMetrics.startTime = Date.now();
 		}
 		this._typingMetrics.lastUpdateTime = Date.now();
 		
-		// Count characters (including spaces)
-		if (e.text) {
-			this._typingMetrics.characters += e.text.length;
-			// Simple word count: split by spaces
-			const words = e.text.trim().split(/\s+/).filter(w => w.length > 0);
-			this._typingMetrics.words += words.length;
+		// Count printable characters
+		if (e.key && e.key.length === 1) {
+			this._typingMetrics.characters++;
+			
+			// Count words (space indicates word completion)
+			if (e.key === ' ') {
+				this._typingMetrics.words++;
+			}
 		}
 	}
 
-	_onKeyDown(e) {
-		// Track backspace/delete as negative input
-		if (e.keyCode === 8 || e.keyCode === 46) { // Backspace or Delete
+	_onInputDOM(e) {
+		console.log('Input event detected:', e);
+		
+		if (!this._typingMetrics.startTime) {
+			this._typingMetrics.startTime = Date.now();
+		}
+		this._typingMetrics.lastUpdateTime = Date.now();
+	}
+
+	_onKeyDownDOM(e) {
+		console.log('KeyDown detected:', e.key, e.keyCode);
+		
+		// Track backspace/delete
+		if (e.keyCode === 8 || e.keyCode === 46) {
 			if (!this._typingMetrics.startTime) {
 				this._typingMetrics.startTime = Date.now();
 			}
@@ -77,49 +106,6 @@ class StatusBar extends JSDialog.Toolbar {
 			this._typingMetrics.characters = Math.max(0, this._typingMetrics.characters - 1);
 		}
 	}
-
-	_calculateCPM() {
-		if (!this._typingMetrics.startTime) return 0;
-		
-		const elapsedMinutes = (Date.now() - this._typingMetrics.startTime) / 60000;
-		if (elapsedMinutes === 0) return 0;
-		
-		return Math.round(this._typingMetrics.characters / elapsedMinutes);
-	}
-
-	_calculateWPM() {
-		if (!this._typingMetrics.startTime) return 0;
-		
-		const elapsedMinutes = (Date.now() - this._typingMetrics.startTime) / 60000;
-		if (elapsedMinutes === 0) return 0;
-		
-		return Math.round(this._typingMetrics.words / elapsedMinutes);
-	}
-
-	_logTypingMetrics() {
-		// Reset if inactive for more than 5 seconds
-		if (this._typingMetrics.lastUpdateTime && 
-		    (Date.now() - this._typingMetrics.lastUpdateTime > 5000)) {
-			this._resetTypingMetrics();
-			return;
-		}
-
-		const cpm = this._calculateCPM();
-		const wpm = this._calculateWPM();
-		
-		if (cpm > 0 || wpm > 0) {
-			console.log(`Typing Speed - WPM: ${wpm}, CPM: ${cpm}`);
-		}
-	}
-
-	_resetTypingMetrics() {
-		this._typingMetrics.characters = 0;
-		this._typingMetrics.words = 0;
-		this._typingMetrics.startTime = null;
-		this._typingMetrics.lastUpdateTime = null;
-		console.log('Typing metrics reset due to inactivity');
-	}
-
 	isSaveIndicatorActive() {
 		return window.useStatusbarSaveIndicator;
 	}
