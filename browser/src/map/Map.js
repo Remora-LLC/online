@@ -1445,6 +1445,11 @@ window.L.Map = window.L.Evented.extend({
 
 	// Our browser tab lost focus.
 	_onLostFocus: function () {
+		var width = this._container.clientWidth;
+		var height = this._container.clientHeight;
+		// DRN IMPLEMENT
+		//app.trackWindowAction(WindowState.Blurred, x);
+	
 		console.log('WINDOW BLUR Tab/window lost focus: DEBUG');
 		window.prefs.sendPendingBrowserSettingsUpdate();
 		// don't deactivate view while Drag and Drop in Pivot table dialog
@@ -1461,6 +1466,11 @@ window.L.Map = window.L.Evented.extend({
 
 	// Our browser tab got focus.
 	_onGotFocus: function () {
+		var width = this._container.clientWidth;
+		var height = this._container.clientHeight;
+		// DRN IMPLEMENT
+		//app.trackWindowAction(WindowState.Focused, x);
+
 		console.log('WINDOW FOCUS Tab/window gained focus: DEBUG');
 		if (this.editorHasFocus()) {
 			this.fire('editorgotfocus');
@@ -1487,16 +1497,16 @@ window.L.Map = window.L.Evented.extend({
 			this._changeFocusWidget(e.dialog, e.winId, e.acceptInput);
 		}
 	},
-	
+
 	_onWindowResize: function () {
 		try {
 			var parentWidth = window.top.innerWidth;
 			var parentHeight = window.top.innerHeight;
+			// realistically this shouldn't happen so don't worry about it
 			console.log('WINDOW SIZE CHANGED: ' + parentWidth + 'x' + parentHeight + ' (parent) DEBUG');
 		} catch (e) {
-			// CORS restriction - can't access parent window
 			var width = this._container.clientWidth;
-			var height = this._container.clientHeight;
+			var height = this._container.clientHeight;			
 			console.log('WINDOW SIZE CHANGED: ' + width + 'x' + height + ' (iframe) DEBUG');
 		}
 	},
